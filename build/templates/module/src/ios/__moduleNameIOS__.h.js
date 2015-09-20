@@ -5,8 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `
-#import "RCTBridgeModule.h"
+  return `#import "RCTBridgeModule.h"
 
 @interface ${ config.ios.moduleName } : NSObject <RCTBridgeModule>
 

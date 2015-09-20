@@ -5,8 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `
-apple_library(
+  return `apple_library(
   name = '${ config.ios.moduleName }',
   deps = [
     ':OtherLibrary',

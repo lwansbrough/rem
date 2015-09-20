@@ -25,8 +25,8 @@ var readAsync = _asyncToGenerator(function* (path) {
 
 var writeAsync = _asyncToGenerator(function* (directory, filename, contents) {
   return new _Promise(function (resolve, reject) {
-    (0, _mkdirp2['default'])(directory, _asyncToGenerator(function* (err, success) {
-      if (err || !success) return reject(err || new Error('Failed to create directory.'));
+    (0, _mkdirp2['default'])(directory, _asyncToGenerator(function* (err) {
+      if (err) return reject(err);
       var filePath = _path2['default'].join(directory, filename);
       yield fs.promise.writeFile(filePath, contents, 'utf8');
       resolve();
@@ -43,29 +43,41 @@ var build = _asyncToGenerator(function* (config, directory) {
   };
 
   return new _Promise(function (resolve, reject) {
-    var walker = _walk2['default'].walk('./src', { followLinks: false });
+    var walker = _walk2['default'].walk(_path2['default'].join(__dirname, 'src'), { followLinks: false });
 
     walker.on('file', _asyncToGenerator(function* (basedir, stat, next) {
-      basedir = basedir.replace('src/templates/module/src/', '');
 
-      if (basedir === 'android/src/main/java') {
-        basedir += '/' + config.packageName.replace('.', '/');
+      var template = require(_path2['default'].join(basedir, stat.name));
+
+      var relativePath = basedir.replace(sourcePath, '.');
+      var finalPath = _path2['default'].join(process.cwd(), relativePath);
+
+      console.log(relativePath);
+
+      if (relativePath === './android/src/main/java') {
+        finalPath = _path2['default'].join(finalPath, config.android.packageIdentifier.replace(new RegExp('\\.', 'g'), '/'));
       }
 
-      var fixedBaseDir = fixPath(pathConfig, basedir);
-      var fixedFilename = fixPath(pathConfig, filename);
-      var path = `${ fixedBaseDir }/${ fixedFilename }`;
-      var template = yield readAsync(path);
+      var fixedPath = fixPath(pathConfig, finalPath);
+      var fixedFilename = fixPath(pathConfig, stat.name);
 
-      var lastDotIndex = path.lastIndexOf('.');
-      var extension = path.slice(lastDotIndex);
+      var lastDotIndex = fixedFilename.lastIndexOf('.');
+      var extension = fixedFilename.slice(lastDotIndex);
       if (extension === '.js') {
-        path = path.slice(0, lastDotIndex);
+        fixedFilename = fixedFilename.slice(0, lastDotIndex);
       }
 
-      yield writeAsync(fixedBaseDir, fixedFilename, template(config));
+      yield writeAsync(fixedPath, fixedFilename, template(config));
       next();
     }));
+
+    walker.on('errors', function errorsHandler(root, nodeStatsArray, next) {
+      nodeStatsArray.forEach(function (n) {
+        console.error("[ERROR] " + n.name);
+        console.error(n.error.message || n.error.code + ": " + n.error.path);
+      });
+      next();
+    });
 
     walker.on('end', resolve);
   });
@@ -87,10 +99,12 @@ var _mkdirp2 = _interopRequireDefault(_mkdirp);
 
 const fs = require('fs');
 
+const sourcePath = _path2['default'].join(__dirname, 'src');
+
 function fixPath(config, path) {
   var keys = _Object$keys(config);
-  keys.forEach(function (value, key) {
-    path = path.replace(`__${ key }__`, value);
+  keys.forEach(function (key) {
+    path = path.replace(`__${ key }__`, config[key]);
   });
   return path;
 }

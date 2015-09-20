@@ -2,9 +2,6 @@ export default (config) => {
   return (
 `package ${config.android.packageIdentifier};
 
-import android.content.Intent;
-import android.content.ActivityNotFoundException;
-
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;

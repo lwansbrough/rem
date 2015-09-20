@@ -50,9 +50,9 @@ var mainAsync = _asyncToGenerator(function* () {
     //   break;
     // }
 
-    case 'module init':
+    case 'init-module':
       {
-        yield verifyCurrentDirectoryAsync();
+        // await verifyCurrentDirectoryAsync();
 
         // let settings = await Settings.loadAsync();
         // let buckLoader = new BuckLoader(settings);
@@ -70,12 +70,14 @@ var mainAsync = _asyncToGenerator(function* () {
         yield (0, _ModuleManager.createModuleProject)({
           moduleName: 'Test',
           android: {
-            moduleName: 'REMTest'
+            moduleName: 'REMTest',
+            packageIdentifier: 'com.example.test'
           },
           ios: {
-            moduleName: 'REMTest'
+            moduleName: 'REMTest',
+            packageIdentifier: 'com.example.test'
           }
-        }, process.cwd);
+        }, process.cwd());
 
         break;
       }
@@ -118,9 +120,9 @@ require('instapromise');
 
 const fs = require('fs');
 
-const BuckLoader = require('./BuckLoader');
-const BuckEditor = require('./BuckEditor');
-const BuckFragmentGenerator = require('./BuckFragmentGenerator');
+// const BuckLoader = require('./BuckLoader');
+// const BuckEditor = require('./BuckEditor');
+// const BuckFragmentGenerator = require('./BuckFragmentGenerator');
 const Settings = require('./Settings');
 
 if (module === require.main) {

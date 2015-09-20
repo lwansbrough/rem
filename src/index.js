@@ -5,9 +5,9 @@ require('instapromise');
 
 const fs = require('fs');
 
-const BuckLoader = require('./BuckLoader');
-const BuckEditor = require('./BuckEditor');
-const BuckFragmentGenerator = require('./BuckFragmentGenerator');
+// const BuckLoader = require('./BuckLoader');
+// const BuckEditor = require('./BuckEditor');
+// const BuckFragmentGenerator = require('./BuckFragmentGenerator');
 const Settings = require('./Settings');
 
 import { createModuleProject } from './ModuleManager';
@@ -66,8 +66,8 @@ async function mainAsync() {
     //   break;
     // }
     
-    case 'module init': {
-      await verifyCurrentDirectoryAsync();
+    case 'init-module': {
+      // await verifyCurrentDirectoryAsync();
 
       // let settings = await Settings.loadAsync();
       // let buckLoader = new BuckLoader(settings);
@@ -85,12 +85,14 @@ async function mainAsync() {
       await createModuleProject({
         moduleName: 'Test',
         android: {
-          moduleName: 'REMTest'
+          moduleName: 'REMTest',
+          packageIdentifier: 'com.example.test'
         },
         ios: {
-          moduleName: 'REMTest'
+          moduleName: 'REMTest',
+          packageIdentifier: 'com.example.test'
         }
-      }, process.cwd);
+      }, process.cwd());
       
       break;
     }

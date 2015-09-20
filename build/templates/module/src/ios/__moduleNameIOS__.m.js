@@ -5,8 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `
-#import "${ config.ios.moduleName }.h"
+  return `#import "${ config.ios.moduleName }.h"
 
 @implementation ${ config.ios.moduleName }
 

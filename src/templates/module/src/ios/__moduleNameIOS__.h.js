@@ -1,7 +1,6 @@
 export default (config) => {
   return (
-`
-#import "RCTBridgeModule.h"
+`#import "RCTBridgeModule.h"
 
 @interface ${config.ios.moduleName} : NSObject <RCTBridgeModule>
 

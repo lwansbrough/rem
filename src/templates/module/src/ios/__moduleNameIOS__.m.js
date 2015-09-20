@@ -1,7 +1,6 @@
 export default (config) => {
   return (
-`
-#import "${config.ios.moduleName}.h"
+`#import "${config.ios.moduleName}.h"
 
 @implementation ${config.ios.moduleName}
 

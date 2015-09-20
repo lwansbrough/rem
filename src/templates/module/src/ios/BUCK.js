@@ -1,7 +1,6 @@
 export default (config) => {
   return (
-`
-apple_library(
+`apple_library(
   name = '${config.ios.moduleName}',
   deps = [
     ':OtherLibrary',

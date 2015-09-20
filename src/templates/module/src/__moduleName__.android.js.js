@@ -1,7 +1,6 @@
 export default (config) => {
   return (
-`
-/**
+`/**
  * @providesModule ${config.moduleName}
  * @flow
  */

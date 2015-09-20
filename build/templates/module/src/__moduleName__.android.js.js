@@ -5,8 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `
-/**
+  return `/**
  * @providesModule ${ config.moduleName }
  * @flow
  */
