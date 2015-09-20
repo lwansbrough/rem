@@ -6,60 +6,39 @@ Rem works with dependency managers like [npm](https://www.npmjs.com/) and [Cocoa
 
 ## Setting up rem
 
-To use rem, you'll need [io.js](https://iojs.org), CocoaPods, and the rem program itself. We'll help you set these up in the way we're really happy with if you don't have them already.
+To use rem, you'll need [Node.js](https://nodejs.org), [Buck](https://buckbuild.com), and the rem program itself. We'll help you set these up in the way we're really happy with if you don't have them already.
 
-### Installing io.js
+### Installing Node.js
 
-io.js is a JavaScript platform based on Node.js, with a modern JS VM and the newest APIs on which rem is built. We recommend installing io.js with [nvm](https://github.com/creationix/nvm), which is a script that lets you cleanly install several versions of io.js and Node.js.
+We recommend installing Node.js with [nvm](https://github.com/creationix/nvm), which is a script that lets you cleanly install and manage several versions of Node.js simultaneously.
 
 #### nvm (recommended)
 
 To set up nvm, run:
 ```
-curl https://raw.githubusercontent.com/creationix/nvm/v0.25.0/install.sh | bash
+curl https://raw.githubusercontent.com/creationix/nvm/v0.26.1/install.sh | bash
 ```
 
-Next, install the newest version of io.js:
+Next, install the newest version of Node.js:
 ```
-nvm install iojs
-```
-Until you close your terminal, running `node` will start the io.js program that you just installed.
-
-Last, you can optionally tell nvm to enable io.js when you open a new terminal window so that `node` will always start io.js:
-```
-nvm alias default iojs
+nvm install stable
 ```
 
 #### Other Methods
 
-io.js is available through [Homebrew](http://brew.sh/). Install brew and run:
+Node.js is available through [Homebrew](http://brew.sh/). Install brew and run:
 ```
-brew install iojs
-```
-
-The official io.js site also has a link to a Mac installer package. Visit https://iojs.org.
-
-
-### Installing CocoaPods
-
-The most common way to install CocoaPods is from a Ruby gem. It works with the default version of Ruby included with OS X, so you can run:
-```
-sudo gem install cocoapods
+brew install node
 ```
 
-Another option is to install [the new standalone CocoaPods installer](https://github.com/CocoaPods/CocoaPods-app).  It is available through Homebrew:
-```
-brew install Caskroom/cask/cocoapods
-```
-
-For other ways to install CocoaPods and to keep it up to date, see [the CocoaPods installation guide](https://guides.cocoapods.org/using/getting-started.html).
+The official Node.js site also has a link to a Mac installer package. Visit https://nodejs.org.
 
 
 ### Installing rem
 
-Rem is available as an npm package. Run:
+rem is available as an npm package via GitHub. Run:
 ```
-npm install -g ReactExtensionManager/rem
+npm install -g exponentjs/rem
 ```
 Once rem is ready, we'll publish it to npm.
 
@@ -69,7 +48,7 @@ React Native extensions are npm packages that include native code. Rem's job is 
 
 ### 1. Set up rem (one-time)
 
-The first time you use rem in your project, you will need to set up rem. By default, rem assumes that your JS project and Xcode project reside in the same directory. This is how projects created with `react-native init` are set up. If this is the case for your project, run:
+The first time you use rem in your project, you will need to set up rem. By default, rem assumes that your JS project resides in your project's root directory, and Android/iOS specific code are in the `android` and `ios` directories respectively. This is how projects created with `react-native init` are set up. If this is the case for your project, run:
 ```
 npm install rem --save-dev
 rem init
@@ -84,30 +63,28 @@ For projects with different directory hierarchies, you can configure rem in your
     // code for your app. This path is relative to the directory that contains
     // your package.json file.
     "reactNativePath": "node_modules/react-native",
-    // Directory that contains your app's Xcode project file. This path is
-    // relative to the directory that contains your package.json file.
-    "xcodeProjectDirectory": "",
+    // Maps your app's build targets to their respective directories relative
+    // to this package.json file. The settings below are the default for
+    // new React Native apps.
+    "targetDirectories": {
+      "android": "./android",
+      "ios": "./ios"
+    }
   }
 }
 ```
 Then run `npm install rem --save-dev && rem init`.
 
-Rem will create a Podfile in your Xcode project directory, or edit your existing one if  you are already using CocoaPods.
+rem will create a BUCK file in your root project directory, or edit your existing one if you are already using Buck.
 
 ### 2. Install npm packages
 
-Install npm packages with native code that you would like to use. For example, from your JS project directory, run:
+Install npm packages with native code that you would like to use. For example, from your root project directory, run:
 ```
 npm install react-native-url-handler
 ```
 
-### 3. Install native dependencies
-
-Next, we need to install the native dependencies and add them to the Xcode project with the help of CocoaPods. Go to the directory that contains your Xcode project and you should see a file named "Podfile". From this directory, install your native dependencies by running:
-```
-pod install
-```
-This step may take a minute or so, as CocoaPods needs to determine which version of your dependencies to use and then download them.
+This step may take a minute or so, as rem will be using Buck to build the above module from its source files.
 
 ### 4. Run app
 

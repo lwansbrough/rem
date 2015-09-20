@@ -5,17 +5,6 @@ import mkdirp from 'mkdirp';
 
 const sourcePath = path.join(__dirname, 'src');
 
-async function readAsync(path) {
-  try {
-    return await fs.promise.readFile(path, 'utf8');
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
-  }
-}
-
 async function writeAsync(directory, filename, contents) {
   return new Promise((resolve, reject) => {
     mkdirp(directory, async (err) => {
@@ -51,10 +40,13 @@ function createWalkerFileHandler(config, directory) {
   };
   
   return async (root, stat, next) => {
-    let template = require(path.join(root, stat.name));
+    let originalPath = path.join(root, stat.name);
+    delete require.cache[originalPath];
+    let template = require(originalPath);
     let relativePath = root.replace(sourcePath, '.');
-    let finalPath = path.join(process.cwd(), relativePath);
-    
+    let finalPath = path.join(directory, relativePath);
+
+    // Ensure Android's Java files are added into a folder structure matching the package identifier
     if (relativePath === './android/src/main/java') {
       finalPath = path.join(finalPath, config.android.packageIdentifier.replace(new RegExp('\\.', 'g'), '/'));
     }
@@ -78,7 +70,7 @@ export async function build(config, directory) {
   let walkerFileHandler = createWalkerFileHandler(config, directory);
   
   return new Promise((resolve, reject) => {
-    let walker = walk.walk(path.join(__dirname, 'src'), { followLinks: false });
+    let walker = walk.walk(sourcePath);
     walker.on('file', walkerFileHandler);
     walker.on('errors', walkerErrorHandler);
     walker.on('end', resolve);

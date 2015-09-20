@@ -6,8 +6,6 @@ var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default
 
 var _asyncToGenerator = require('babel-runtime/helpers/async-to-generator')['default'];
 
-var _Promise = require('babel-runtime/core-js/promise')['default'];
-
 Object.defineProperty(exports, '__esModule', {
   value: true
 });
@@ -16,8 +14,6 @@ require('instapromise');
 const child_process = require('child_process');
 const path = require('path');
 const fs = require('fs');
-
-const templates = require('./templates');
 
 var BuckLoader = (function () {
   function BuckLoader(settings) {
@@ -83,22 +79,9 @@ var BuckLoader = (function () {
      */
   }, {
     key: 'createModuleAsync',
-    value: function createModuleAsync(directory) {
-      return new _Promise(function (resolve, reject) {
-        var options = { cwd: directory };
-        child_process.exec('pod init', options, function (processError, stdout, stderr) {
-          if (processError) {
-            var error = new Error('Could not create BUCK file:\n' + stdout);
-            error.cause = processError;
-            error.stdout = stdout;
-            error.stderr = stderr;
-            reject(error);
-          } else {
-            resolve({ stdout: stdout, stderr: stderr });
-          }
-        });
-      });
-    }
+    value: _asyncToGenerator(function* (directory) {
+      return yield writeAsync(directory, '');
+    })
   }]);
 
   return BuckLoader;

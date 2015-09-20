@@ -6,8 +6,6 @@ const child_process = require('child_process');
 const path = require('path');
 const fs = require('fs');
 
-const templates = require('./templates');
-
 class BuckLoader {
 
   constructor(settings: Settings) {
@@ -62,21 +60,8 @@ class BuckLoader {
   /**
    * Creates a module BUCK file in the given directory.
    */
-  createModuleAsync(directory): ?string {
-    return new Promise((resolve, reject) => {
-      let options = {cwd: directory};
-      child_process.exec('pod init', options, (processError, stdout, stderr) => {
-        if (processError) {
-          let error = new Error('Could not create BUCK file:\n' + stdout);
-          error.cause = processError;
-          error.stdout = stdout;
-          error.stderr = stderr;
-          reject(error);
-        } else {
-          resolve({stdout, stderr});
-        }
-      });
-    });
+  async createModuleAsync(directory: string): ?string {
+    return await writeAsync(directory, '');
   }
 }
 

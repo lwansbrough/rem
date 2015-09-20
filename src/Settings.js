@@ -5,25 +5,38 @@ require('instapromise');
 const path = require('path');
 const fs = require('fs');
 
-const SETTINGS_KEY = 'reactNativeApp';
+const SETTINGS_KEY = 'rem';
 const REACT_NATIVE_PATH_KEY = 'reactNativePath';
-const XCODE_PROJECT_DIRECTORY_KEY = 'xcodeProjectDirectory';
+const REM_MODULE_KEY = 'module';
 
-const DEFAULT_REACT_NATIVE_PATH = 'node_modules/react-native';
-const DEFAULT_XCODE_PROJECT_DIRECTORY = '';
+const APP_DEFAULT_ANDROID_PATH = './android';
+const APP_DEFAULT_IOS_PATH = './ios';
+const APP_DEFAULT_REACT_NATIVE_PATH = 'node_modules/react-native';
+const MODULE_DEFAULT_REACT_NATIVE_PATH = '../react-native';
 
 class Settings {
 
-  constructor(baseDirectory, options) {
+  constructor(baseDirectory, manifest) {
+    let options = manifest[SETTINGS_KEY] || {};
+    this.npm = manifest;
+    this.isRemEnabled = !!manifest[SETTINGS_KEY];
+    this.isModule = !!options[REM_MODULE_KEY];
     this.baseDirectory = baseDirectory;
     this.reactNativePath = path.resolve(
       baseDirectory,
-      options[REACT_NATIVE_PATH_KEY] || DEFAULT_REACT_NATIVE_PATH
+      options[REACT_NATIVE_PATH_KEY] || (this.isModule ? MODULE_DEFAULT_REACT_NATIVE_PATH : APP_DEFAULT_REACT_NATIVE_PATH)
     );
-    this.xcodeProjectDirectory = path.resolve(
-      baseDirectory,
-      options[XCODE_PROJECT_DIRECTORY_KEY] || DEFAULT_XCODE_PROJECT_DIRECTORY
-    );
+  }
+  
+  static generateModuleSettings() {
+    return {
+      [REM_MODULE_KEY]: true,
+      [REACT_NATIVE_PATH_KEY]: MODULE_DEFAULT_REACT_NATIVE_PATH,
+      targetDirectories: {
+        android: APP_DEFAULT_ANDROID_PATH,
+        ios: APP_DEFAULT_IOS_PATH
+      }
+    }
   }
 
   /**
@@ -35,8 +48,7 @@ class Settings {
     let packageJSONPath = path.resolve(baseDirectory, 'package.json');
     let packageJSON = await fs.promise.readFile(packageJSONPath, 'utf8');
     let manifest = JSON.parse(packageJSON);
-    let options = manifest[SETTINGS_KEY] || {};
-    return new Settings(baseDirectory, options);
+    return new Settings(baseDirectory, manifest);
   }
 }
 

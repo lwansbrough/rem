@@ -4,13 +4,16 @@
 require('instapromise');
 
 const fs = require('fs');
+const stdio = require('readline').createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
 // const BuckLoader = require('./BuckLoader');
 // const BuckEditor = require('./BuckEditor');
 // const BuckFragmentGenerator = require('./BuckFragmentGenerator');
-const Settings = require('./Settings');
-
-import { createModuleProject } from './ModuleManager';
+import ModuleManager from './ModuleManager';
+import Settings from './Settings';
 
 async function mainAsync() {
   let yargs = require('yargs')
@@ -69,7 +72,6 @@ async function mainAsync() {
     case 'init-module': {
       // await verifyCurrentDirectoryAsync();
 
-      // let settings = await Settings.loadAsync();
       // let buckLoader = new BuckLoader(settings);
       // let buckEditor = new BuckEditor(settings);
       // let buckFile = await buckLoader.readEnsuredAsync();
@@ -82,18 +84,36 @@ async function mainAsync() {
       //   console.log("The module is now initialized for rem.");
       // }
       
-      await createModuleProject({
-        moduleName: 'Test',
-        npmName: 'react-native-test',
-        android: {
-          moduleName: 'REMTest',
-          packageIdentifier: 'com.example.test'
-        },
-        ios: {
-          moduleName: 'REMTest',
-          packageIdentifier: 'com.example.test'
-        }
-      }, process.cwd());
+      await verifyCurrentDirectoryAsync('run "npm init" in the root directory of your module');
+      
+      let settings = await Settings.loadAsync();
+      
+      let moduleManager = new ModuleManager(settings);
+      if (moduleManager.isInitialized() && moduleManager.isModule()) {
+        console.log("The module has already been initialized.");
+      }
+      else if (moduleManager.isInitialized()) {
+        console.log("This directory appears to be initialized by rem, but is not a module. Aborting to avoid potentially destructive changes.");
+      }
+      else {
+        stdio.question("Set your module's class name (PascalCase, for example: NetworkDiscoverer): ", async (moduleName) => {
+          stdio.question("Set your module's package identifier. The last part must match your module's class name. (For example: com.example.NetworkDiscoverer): ", async (packageIdentifier) => {
+            await moduleManager.createProject({
+              npmName: settings.npm.name,
+              moduleName,
+              android: {
+                moduleName,
+                packageIdentifier
+              },
+              ios: {
+                moduleName: `REM${moduleName}`,
+                packageIdentifier
+              }
+            });
+            console.log("The module is now initialized for rem.");
+          });
+        });
+      }
       
       break;
     }
@@ -119,11 +139,12 @@ async function mainAsync() {
   }
 }
 
-async function verifyCurrentDirectoryAsync() {
+async function verifyCurrentDirectoryAsync(message) {
   try {
     await fs.promise.access('package.json');
   } catch (error) {
-    console.error('package.json not found; run "rem init" in the root directory of your JS project');
+    message = message || 'run "rem init" in the root directory of your JS project';
+    console.error(`package.json not found; ${message}`);
     process.exit(1);
   }
 }

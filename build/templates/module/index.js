@@ -12,17 +12,6 @@ Object.defineProperty(exports, '__esModule', {
   value: true
 });
 
-var readAsync = _asyncToGenerator(function* (path) {
-  try {
-    return yield fs.promise.readFile(path, 'utf8');
-  } catch (error) {
-    if (error.code === 'ENOENT') {
-      return null;
-    }
-    throw error;
-  }
-});
-
 var writeAsync = _asyncToGenerator(function* (directory, filename, contents) {
   return new _Promise(function (resolve, reject) {
     (0, _mkdirp2['default'])(directory, _asyncToGenerator(function* (err) {
@@ -39,7 +28,7 @@ var build = _asyncToGenerator(function* (config, directory) {
   var walkerFileHandler = createWalkerFileHandler(config, directory);
 
   return new _Promise(function (resolve, reject) {
-    var walker = _walk2['default'].walk(_path2['default'].join(__dirname, 'src'), { followLinks: false });
+    var walker = _walk2['default'].walk(sourcePath);
     walker.on('file', walkerFileHandler);
     walker.on('errors', walkerErrorHandler);
     walker.on('end', resolve);
@@ -88,10 +77,13 @@ function createWalkerFileHandler(config, directory) {
   };
 
   return _asyncToGenerator(function* (root, stat, next) {
-    var template = require(_path2['default'].join(root, stat.name));
+    var originalPath = _path2['default'].join(root, stat.name);
+    delete require.cache[originalPath];
+    var template = require(originalPath);
     var relativePath = root.replace(sourcePath, '.');
-    var finalPath = _path2['default'].join(process.cwd(), relativePath);
+    var finalPath = _path2['default'].join(directory, relativePath);
 
+    // Ensure Android's Java files are added into a folder structure matching the package identifier
     if (relativePath === './android/src/main/java') {
       finalPath = _path2['default'].join(finalPath, config.android.packageIdentifier.replace(new RegExp('\\.', 'g'), '/'));
     }
