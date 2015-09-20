@@ -57,12 +57,12 @@ rubyEscapeString = function(s) {
 
 jsonAsync = co.wrap(function*(filepath) {
   "Returns the JSON object from a given JSON file asynchronously";
-  var e, json;
+  var e, error, json;
   json = (yield fs.promise.readFile(filepath, 'utf8'));
   try {
     return JSON.parse(json);
-  } catch (_error) {
-    e = _error;
+  } catch (error) {
+    e = error;
     throw new Error((util.inspect(e)) + " in " + (path.resolve(filepath)));
   }
 });

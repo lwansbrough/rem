@@ -6,14 +6,9 @@ var _classCallCheck = require('babel-runtime/helpers/class-call-check')['default
 
 var _asyncToGenerator = require('babel-runtime/helpers/async-to-generator')['default'];
 
-var _Object$defineProperty = require('babel-runtime/core-js/object/define-property')['default'];
-
-_Object$defineProperty(exports, '__esModule', {
+Object.defineProperty(exports, '__esModule', {
   value: true
 });
-
-'use strict';
-
 require('instapromise');
 
 const path = require('path');
@@ -35,13 +30,13 @@ var Settings = (function () {
     this.xcodeProjectDirectory = path.resolve(baseDirectory, options[XCODE_PROJECT_DIRECTORY_KEY] || DEFAULT_XCODE_PROJECT_DIRECTORY);
   }
 
+  /**
+   * Loads the configuration settings from the package.json file in the current
+   * working directory.
+   */
+
   _createClass(Settings, null, [{
     key: 'loadAsync',
-
-    /**
-     * Loads the configuration settings from the package.json file in the current
-     * working directory.
-     */
     value: _asyncToGenerator(function* () {
       var baseDirectory = process.cwd();
       var packageJSONPath = path.resolve(baseDirectory, 'package.json');
