@@ -69,6 +69,7 @@ var mainAsync = _asyncToGenerator(function* () {
 
         yield (0, _ModuleManager.createModuleProject)({
           moduleName: 'Test',
+          npmName: 'react-native-test',
           android: {
             moduleName: 'REMTest',
             packageIdentifier: 'com.example.test'

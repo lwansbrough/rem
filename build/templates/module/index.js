@@ -36,49 +36,12 @@ var writeAsync = _asyncToGenerator(function* (directory, filename, contents) {
 
 var build = _asyncToGenerator(function* (config, directory) {
 
-  var pathConfig = {
-    moduleName: config.moduleName,
-    moduleNameAndroid: config.android.moduleName,
-    moduleNameIOS: config.ios.moduleName
-  };
+  var walkerFileHandler = createWalkerFileHandler(config, directory);
 
   return new _Promise(function (resolve, reject) {
     var walker = _walk2['default'].walk(_path2['default'].join(__dirname, 'src'), { followLinks: false });
-
-    walker.on('file', _asyncToGenerator(function* (basedir, stat, next) {
-
-      var template = require(_path2['default'].join(basedir, stat.name));
-
-      var relativePath = basedir.replace(sourcePath, '.');
-      var finalPath = _path2['default'].join(process.cwd(), relativePath);
-
-      console.log(relativePath);
-
-      if (relativePath === './android/src/main/java') {
-        finalPath = _path2['default'].join(finalPath, config.android.packageIdentifier.replace(new RegExp('\\.', 'g'), '/'));
-      }
-
-      var fixedPath = fixPath(pathConfig, finalPath);
-      var fixedFilename = fixPath(pathConfig, stat.name);
-
-      var lastDotIndex = fixedFilename.lastIndexOf('.');
-      var extension = fixedFilename.slice(lastDotIndex);
-      if (extension === '.js') {
-        fixedFilename = fixedFilename.slice(0, lastDotIndex);
-      }
-
-      yield writeAsync(fixedPath, fixedFilename, template(config));
-      next();
-    }));
-
-    walker.on('errors', function errorsHandler(root, nodeStatsArray, next) {
-      nodeStatsArray.forEach(function (n) {
-        console.error("[ERROR] " + n.name);
-        console.error(n.error.message || n.error.code + ": " + n.error.path);
-      });
-      next();
-    });
-
+    walker.on('file', walkerFileHandler);
+    walker.on('errors', walkerErrorHandler);
     walker.on('end', resolve);
   });
 });
@@ -107,5 +70,43 @@ function fixPath(config, path) {
     path = path.replace(`__${ key }__`, config[key]);
   });
   return path;
+}
+
+function walkerErrorHandler(root, nodeStatsArray, next) {
+  nodeStatsArray.forEach(function (n) {
+    console.error(`[ERROR] ${ n.name }`);
+    console.error(n.error.message || n.error.code + ": " + n.error.path);
+  });
+  next();
+}
+
+function createWalkerFileHandler(config, directory) {
+  var pathConfig = {
+    moduleName: config.moduleName,
+    moduleNameAndroid: config.android.moduleName,
+    moduleNameIOS: config.ios.moduleName
+  };
+
+  return _asyncToGenerator(function* (root, stat, next) {
+    var template = require(_path2['default'].join(root, stat.name));
+    var relativePath = root.replace(sourcePath, '.');
+    var finalPath = _path2['default'].join(process.cwd(), relativePath);
+
+    if (relativePath === './android/src/main/java') {
+      finalPath = _path2['default'].join(finalPath, config.android.packageIdentifier.replace(new RegExp('\\.', 'g'), '/'));
+    }
+
+    var fixedPath = fixPath(pathConfig, finalPath);
+    var fixedFilename = fixPath(pathConfig, stat.name);
+
+    var lastDotIndex = fixedFilename.lastIndexOf('.');
+    var extension = fixedFilename.slice(lastDotIndex);
+    if (extension === '.js') {
+      fixedFilename = fixedFilename.slice(0, lastDotIndex);
+    }
+
+    yield writeAsync(fixedPath, fixedFilename, template(config));
+    next();
+  });
 }
 //# sourceMappingURL=../../sourcemaps/templates/module/index.js.map

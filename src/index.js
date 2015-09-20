@@ -84,6 +84,7 @@ async function mainAsync() {
       
       await createModuleProject({
         moduleName: 'Test',
+        npmName: 'react-native-test',
         android: {
           moduleName: 'REMTest',
           packageIdentifier: 'com.example.test'
