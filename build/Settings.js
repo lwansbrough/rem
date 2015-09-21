@@ -19,9 +19,12 @@ const fs = require('fs');
 const SETTINGS_KEY = 'rem';
 const REACT_NATIVE_PATH_KEY = 'reactNativePath';
 const REM_MODULE_KEY = 'module';
+const REM_BUCK_RULE_KEY = 'rem_build';
 
 const APP_DEFAULT_ANDROID_PATH = './android';
 const APP_DEFAULT_IOS_PATH = './ios';
+const MODULE_DEFAULT_ANDROID_PATH = './android';
+const MODULE_DEFAULT_IOS_PATH = './ios';
 const APP_DEFAULT_REACT_NATIVE_PATH = 'node_modules/react-native';
 const MODULE_DEFAULT_REACT_NATIVE_PATH = '../react-native';
 
@@ -38,14 +41,24 @@ var Settings = (function () {
   }
 
   _createClass(Settings, null, [{
-    key: 'generateModuleSettings',
-    value: function generateModuleSettings() {
+    key: 'generateAppSettings',
+    value: function generateAppSettings() {
       var _ref;
 
-      return (_ref = {}, _defineProperty(_ref, REM_MODULE_KEY, true), _defineProperty(_ref, REACT_NATIVE_PATH_KEY, MODULE_DEFAULT_REACT_NATIVE_PATH), _defineProperty(_ref, 'targetDirectories', {
+      return (_ref = {}, _defineProperty(_ref, REACT_NATIVE_PATH_KEY, APP_DEFAULT_REACT_NATIVE_PATH), _defineProperty(_ref, 'targetDirectories', {
         android: APP_DEFAULT_ANDROID_PATH,
         ios: APP_DEFAULT_IOS_PATH
       }), _ref);
+    }
+  }, {
+    key: 'generateModuleSettings',
+    value: function generateModuleSettings() {
+      var _ref2;
+
+      return (_ref2 = {}, _defineProperty(_ref2, REM_MODULE_KEY, true), _defineProperty(_ref2, REACT_NATIVE_PATH_KEY, MODULE_DEFAULT_REACT_NATIVE_PATH), _defineProperty(_ref2, 'targetDirectories', {
+        android: MODULE_DEFAULT_ANDROID_PATH,
+        ios: MODULE_DEFAULT_IOS_PATH
+      }), _ref2);
     }
 
     /**

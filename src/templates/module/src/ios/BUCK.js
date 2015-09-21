@@ -1,11 +1,8 @@
 export default (config) => {
   return (
 `apple_library(
-  name = '${config.ios.moduleName}',
-  deps = [
-    ':OtherLibrary',
-    '//Libraries:YetAnotherLibrary',
-  ],
+  name = 'rem_build',
+  deps = [],
   preprocessor_flags = ['-fobjc-arc'],
   headers = [
     '${config.ios.moduleName}.h',

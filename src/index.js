@@ -12,15 +12,15 @@ const stdio = require('readline').createInterface({
 // const BuckLoader = require('./BuckLoader');
 // const BuckEditor = require('./BuckEditor');
 // const BuckFragmentGenerator = require('./BuckFragmentGenerator');
+import AppManager from './AppManager';
 import ModuleManager from './ModuleManager';
 import Settings from './Settings';
 
 async function mainAsync() {
   let yargs = require('yargs')
     .usage('Usage: $0 <command> [options]')
-    .command('init', 'Initializes the current directory for a project that supports native modules')
+    .command('init', 'Initializes the current directory for a rem-enabled React Native project')
     .command('clean', 'Removes the rem configuration from the project in the current directory')
-    .command('module init', 'Initializes the current directory for a new React Native module')
     .command('buck-fragment', 'Outputs a code fragment to be evaluated inline within a BUCK file')
     .options('d', {
       alias: 'directory',
@@ -69,7 +69,27 @@ async function mainAsync() {
     //   break;
     // }
     
-    case 'init-module': {
+    case 'install': {
+      let npmName = argv._[1];
+      
+      await verifyCurrentDirectoryAsync("You must first create your app using the React Native CLI.");
+        
+      let settings = await Settings.loadAsync();
+      let appManager = new AppManager(settings);
+      
+      if (appManager.isInitialized() && appManager.isApp()) {
+        await appManager.installModule(npmName);
+      }
+      else {
+        console.log("This directory is not a rem-enabled app.");
+      }
+      process.exit(0);
+      
+      break;
+    }
+    
+    case 'init': {
+      let subCommand = argv._[1];
       // await verifyCurrentDirectoryAsync();
 
       // let buckLoader = new BuckLoader(settings);
@@ -84,36 +104,57 @@ async function mainAsync() {
       //   console.log("The module is now initialized for rem.");
       // }
       
-      await verifyCurrentDirectoryAsync('run "npm init" in the root directory of your module');
-      
-      let settings = await Settings.loadAsync();
-      
-      let moduleManager = new ModuleManager(settings);
-      if (moduleManager.isInitialized() && moduleManager.isModule()) {
-        console.log("The module has already been initialized.");
+      if (subCommand === 'app') {
+        await verifyCurrentDirectoryAsync("You must first create your app using the React Native CLI.");
+        
+        let settings = await Settings.loadAsync();
+        let appManager = new AppManager(settings);
+        if (appManager.isInitialized() && appManager.isApp()) {
+          console.log("The app has already been initialized for use with rem.");
+        }
+        else if (appManager.isInitialized()) {
+          console.log("This directory appears to be initialized by rem, but is not an app. Aborting to avoid potentially destructive changes.");
+        }
+        else {
+          await appManager.createProject();
+          console.log("The app is now initialized for rem.");
+        }
+        process.exit(0);
       }
-      else if (moduleManager.isInitialized()) {
-        console.log("This directory appears to be initialized by rem, but is not a module. Aborting to avoid potentially destructive changes.");
-      }
-      else {
-        stdio.question("Set your module's class name (PascalCase, for example: NetworkDiscoverer): ", async (moduleName) => {
-          stdio.question("Set your module's package identifier. The last part must match your module's class name. (For example: com.example.NetworkDiscoverer): ", async (packageIdentifier) => {
-            await moduleManager.createProject({
-              npmName: settings.npm.name,
-              moduleName,
-              android: {
+      else if (subCommand === 'module') {
+        await verifyCurrentDirectoryAsync('run "npm init" in the root directory of your module');
+      
+        let settings = await Settings.loadAsync();
+        let moduleManager = new ModuleManager(settings);
+        if (moduleManager.isInitialized() && moduleManager.isModule()) {
+          console.log("The module has already been initialized.");
+        }
+        else if (moduleManager.isInitialized()) {
+          console.log("This directory appears to be initialized by rem, but is not a module. Aborting to avoid potentially destructive changes.");
+        }
+        else {
+          stdio.question("Set your module's class name (PascalCase, for example: NetworkDiscoverer): ", async (moduleName) => {
+            stdio.question("Set your module's package identifier. The last part must match your module's class name. (For example: com.example.NetworkDiscoverer): ", async (packageIdentifier) => {
+              await moduleManager.createProject({
+                npmName: settings.npm.name,
                 moduleName,
-                packageIdentifier
-              },
-              ios: {
-                moduleName: `REM${moduleName}`,
-                packageIdentifier
-              }
+                android: {
+                  moduleName,
+                  packageIdentifier
+                },
+                ios: {
+                  moduleName: `REM${moduleName}`,
+                  packageIdentifier
+                }
+              });
+              console.log("The module is now initialized for rem.");
+              process.exit(0);
             });
-            console.log("The module is now initialized for rem.");
           });
-        });
+        }
       }
+      
+      
       
       break;
     }

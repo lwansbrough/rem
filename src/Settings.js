@@ -8,9 +8,12 @@ const fs = require('fs');
 const SETTINGS_KEY = 'rem';
 const REACT_NATIVE_PATH_KEY = 'reactNativePath';
 const REM_MODULE_KEY = 'module';
+const REM_BUCK_RULE_KEY = 'rem_build';
 
 const APP_DEFAULT_ANDROID_PATH = './android';
 const APP_DEFAULT_IOS_PATH = './ios';
+const MODULE_DEFAULT_ANDROID_PATH = './android';
+const MODULE_DEFAULT_IOS_PATH = './ios';
 const APP_DEFAULT_REACT_NATIVE_PATH = 'node_modules/react-native';
 const MODULE_DEFAULT_REACT_NATIVE_PATH = '../react-native';
 
@@ -28,13 +31,23 @@ class Settings {
     );
   }
   
+  static generateAppSettings() {
+    return {
+      [REACT_NATIVE_PATH_KEY]: APP_DEFAULT_REACT_NATIVE_PATH,
+      targetDirectories: {
+        android: APP_DEFAULT_ANDROID_PATH,
+        ios: APP_DEFAULT_IOS_PATH
+      }
+    }
+  }
+  
   static generateModuleSettings() {
     return {
       [REM_MODULE_KEY]: true,
       [REACT_NATIVE_PATH_KEY]: MODULE_DEFAULT_REACT_NATIVE_PATH,
       targetDirectories: {
-        android: APP_DEFAULT_ANDROID_PATH,
-        ios: APP_DEFAULT_IOS_PATH
+        android: MODULE_DEFAULT_ANDROID_PATH,
+        ios: MODULE_DEFAULT_IOS_PATH
       }
     }
   }
