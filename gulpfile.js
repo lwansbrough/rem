@@ -14,14 +14,7 @@ gulp.task('babel', function() {
     .pipe(changed(paths.dest))
     .pipe(sourcemaps.init())
     .pipe(babel({
-      stage: 1,
-      blacklist: [
-        'es6.constants',
-        'es6.forOf',
-        'es6.spec.symbols',
-        'es6.spec.templateLiterals',
-        'es6.templateLiterals',
-      ],
+      stage: 0,
       optional: [
         'asyncToGenerator',
         'runtime',

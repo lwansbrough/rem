@@ -1,20 +1,16 @@
 #!/usr/bin/env node
 'use strict';
 
-require('instapromise');
+import path from 'path';
+
+import * as BuckManager from './BuckManager';
+import * as PackageLoader from './PackageLoader';
 
 const fs = require('fs');
 const stdio = require('readline').createInterface({
   input: process.stdin,
   output: process.stdout
 });
-
-// const BuckLoader = require('./BuckLoader');
-// const BuckEditor = require('./BuckEditor');
-// const BuckFragmentGenerator = require('./BuckFragmentGenerator');
-import AppManager from './AppManager';
-import ModuleManager from './ModuleManager';
-import Settings from './Settings';
 
 async function mainAsync() {
   let yargs = require('yargs')
@@ -35,136 +31,36 @@ async function mainAsync() {
   let command = argv._[0];
 
   switch (command) {
-    // case 'init': {
-    //   await verifyCurrentDirectoryAsync();
 
-    //   let settings = await Settings.loadAsync();
-    //   let buckLoader = new BuckLoader(settings);
-    //   let buckEditor = new BuckEditor(settings);
-    //   let buckFile = await buckLoader.readEnsuredAsync();
-    //   if (buckEditor.hasRemSection(buckFile)) {
-    //     console.log("The project's Podfile is already set up with rem.");
-    //   } else {
-    //     podfile = buckEditor.addRemSection(podfile);
-    //     await buckLoader.writeAsync(podfile);
-    //     console.log("The project's Podfile is now set up with rem.");
-    //   }
-    //   break;
-    // }
-
-    // case 'clean': {
-    //   await verifyCurrentDirectoryAsync();
-
-    //   let settings = await Settings.loadAsync();
-    //   let buckLoader = new BuckLoader(settings);
-    //   let buckEditor = new BuckEditor(settings);
-    //   let buckFile = await buckLoader.readEnsuredAsync();
-    //   if (buckEditor.hasRemSection(buckFile)) {
-    //     buckFile = buckEditor.removeRemSection(buckFile);
-    //     await buckLoader.writeAsync(buckFile);
-    //     console.log("The project's Podfile no longer includes rem.");
-    //   } else {
-    //     console.log("The project's Podfile already does not include rem.");
-    //   }
-    //   break;
-    // }
-    
     case 'install': {
-      let npmName = argv._[1];
+      console.log('Installing...');
+      let rootDirectory = process.cwd();
+      let remDirectory = path.join(rootDirectory, '.rem');
+      let nodeModulesDirectory = path.join(rootDirectory, 'node_modules');
+      let projectPackage = await PackageLoader.getProjectPackage(rootDirectory);
+      let isREMSupported = projectPackage.nativePackage && projectPackage.nativePackage.targetDirectories;
       
-      await verifyCurrentDirectoryAsync("You must first create your app using the React Native CLI.");
-        
-      let settings = await Settings.loadAsync();
-      let appManager = new AppManager(settings);
+      if (!isREMSupported) {
+        console.error('REM is not supported for the current project, please follow the steps in REM\'s readme.');
+        break;
+      }
       
-      if (appManager.isInitialized() && appManager.isApp()) {
-        await appManager.installModule(npmName);
-      }
-      else {
-        console.log("This directory is not a rem-enabled app.");
-      }
-      process.exit(0);
+      let packages = await PackageLoader.getREMCompatiblePackages(nodeModulesDirectory);
+      let targetDirectories = projectPackage.nativePackage.targetDirectories;
+      let targets = {};
+      
+      Object.keys(targetDirectories).forEach(target => {
+        targets[target] = {
+          directory: targetDirectories[target],
+          packages: PackageLoader.filterByTarget(packages, target)
+        };
+      });
+      
+      let buckDefinitions = BuckManager.buildDefinitionsForTargets(targets, nodeModulesDirectory);
+      await BuckManager.writeDefinitions(buckDefinitions, remDirectory);
       
       break;
     }
-    
-    case 'init': {
-      let subCommand = argv._[1];
-      // await verifyCurrentDirectoryAsync();
-
-      // let buckLoader = new BuckLoader(settings);
-      // let buckEditor = new BuckEditor(settings);
-      // let buckFile = await buckLoader.readEnsuredAsync();
-      // if (buckEditor.hasRemSection(buckFile)) {
-      //   console.log("The module has already been initialized.");
-      // }
-      // else {
-      //   buckFile = buckEditor.addRemSection(buckFile);
-      //   await buckLoader.writeAsync(buckFile);
-      //   console.log("The module is now initialized for rem.");
-      // }
-      
-      if (subCommand === 'app') {
-        await verifyCurrentDirectoryAsync("You must first create your app using the React Native CLI.");
-        
-        let settings = await Settings.loadAsync();
-        let appManager = new AppManager(settings);
-        if (appManager.isInitialized() && appManager.isApp()) {
-          console.log("The app has already been initialized for use with rem.");
-        }
-        else if (appManager.isInitialized()) {
-          console.log("This directory appears to be initialized by rem, but is not an app. Aborting to avoid potentially destructive changes.");
-        }
-        else {
-          await appManager.createProject();
-          console.log("The app is now initialized for rem.");
-        }
-        process.exit(0);
-      }
-      else if (subCommand === 'module') {
-        await verifyCurrentDirectoryAsync('run "npm init" in the root directory of your module');
-      
-        let settings = await Settings.loadAsync();
-        let moduleManager = new ModuleManager(settings);
-        if (moduleManager.isInitialized() && moduleManager.isModule()) {
-          console.log("The module has already been initialized.");
-        }
-        else if (moduleManager.isInitialized()) {
-          console.log("This directory appears to be initialized by rem, but is not a module. Aborting to avoid potentially destructive changes.");
-        }
-        else {
-          stdio.question("Set your module's class name (PascalCase, for example: NetworkDiscoverer): ", async (moduleName) => {
-            stdio.question("Set your module's package identifier. The last part must match your module's class name. (For example: com.example.NetworkDiscoverer): ", async (packageIdentifier) => {
-              await moduleManager.createProject({
-                npmName: settings.npm.name,
-                moduleName,
-                android: {
-                  moduleName,
-                  packageIdentifier
-                },
-                ios: {
-                  moduleName: `REM${moduleName}`,
-                  packageIdentifier
-                }
-              });
-              console.log("The module is now initialized for rem.");
-              process.exit(0);
-            });
-          });
-        }
-      }
-      
-      
-      
-      break;
-    }
-
-    // case 'buck-fragment': {
-    //   let baseDirectory = argv.directory;
-    //   let fragment = await BuckFragmentGenerator.fragmentAsync(baseDirectory);
-    //   console.log(fragment);
-    //   break;
-    // }
 
     case null: {
       console.error(yargs.help());
@@ -180,19 +76,44 @@ async function mainAsync() {
   }
 }
 
-async function verifyCurrentDirectoryAsync(message) {
-  try {
-    await fs.promise.access('package.json');
-  } catch (error) {
-    message = message || 'run "rem init" in the root directory of your JS project';
-    console.error(`package.json not found; ${message}`);
-    process.exit(1);
-  }
-}
+mainAsync().catch(err => {
+  console.error(err.stack);
+  process.exit(1);
+});
 
-if (module === require.main) {
-  mainAsync().catch((error) => {
-    console.error(error.stack);
-    process.exit(1);
-  });
-}
+// 0. The React Native app must have the following:
+
+// > `/package.json`
+// {
+//   reactNative: {
+//     targetDirectories: {
+//       android: './android',
+//       ios: './ios'
+//     }
+//   }
+// }
+
+// > `/android/BUCK`
+// `android_binary` needs to include `/.rem/android/BUCK` as a dependency
+
+// > `/ios/BUCK`
+// `apple_binary` needs to include `/.rem/ios/BUCK` as a dependency
+
+// > `/.rem/android/BUCK`
+// Unsure which build command to use (`android_library`?) This file contains an automatically
+// generated target(s) which includes all the 3rd party modules as dependencies
+
+// > `/.rem/ios/BUCK`
+// Unsure which build command to use (`apple_library`?) This file contains an automatically
+// generated target(s) which includes all the 3rd party modules as dependencies
+
+// REM's job:
+// 1. Get app's target platforms by checking its `package.json` for `reactNative->targetDirectories`
+// 2. Get compatible packages from node_modules (has `reactNative` property in `package.json`
+// and supports at least 1 of the app's specified platforms)
+// 3. Add each module's `BUCK` file locations (specified in their `package.json`
+// (`reactNative->targetDirectories`)) for each target to the `.rem/[target]/BUCK` file
+// which is dynamically generated each time the installer is run
+
+// Running `buck build` on any of the app's target directories (`android`, `ios`, etc.) will pull
+// in the dependencies specified in the generated `.rem/[target]/BUCK` file and build the app.
