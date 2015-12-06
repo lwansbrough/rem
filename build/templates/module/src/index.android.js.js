@@ -5,22 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `/**
- * @providesModule ${ config.moduleName }
- * @flow
- */
-'use strict';
-
-var ${ config.android.moduleName } = require('NativeModules').${ config.android.moduleName };
-
-var ${ config.moduleName } = {
-  test: function() {
-    ${ config.android.moduleName }.test();
-  }
-};
-
-module.exports = ${ config.moduleName };
-`;
+  return "/**\n * @providesModule " + config.moduleName + "\n * @flow\n */\n'use strict';\n\nvar " + config.android.moduleName + " = require('NativeModules')." + config.android.moduleName + ";\n\nvar " + config.moduleName + " = {\n  test: function() {\n    " + config.android.moduleName + ".test();\n  }\n};\n\nmodule.exports = " + config.moduleName + ";\n";
 };
 
 module.exports = exports["default"];

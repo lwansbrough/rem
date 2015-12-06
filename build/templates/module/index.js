@@ -49,21 +49,21 @@ var _mkdirp = require('mkdirp');
 
 var _mkdirp2 = _interopRequireDefault(_mkdirp);
 
-const fs = require('fs');
+var fs = require('fs');
 
-const sourcePath = _path2['default'].join(__dirname, 'src');
+var sourcePath = _path2['default'].join(__dirname, 'src');
 
 function fixPath(config, path) {
   var keys = _Object$keys(config);
   keys.forEach(function (key) {
-    path = path.replace(`__${ key }__`, config[key]);
+    path = path.replace('__' + key + '__', config[key]);
   });
   return path;
 }
 
 function walkerErrorHandler(root, nodeStatsArray, next) {
   nodeStatsArray.forEach(function (n) {
-    console.error(`[ERROR] ${ n.name }`);
+    console.error('[ERROR] ' + n.name);
     console.error(n.error.message || n.error.code + ": " + n.error.path);
   });
   next();

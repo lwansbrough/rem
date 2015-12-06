@@ -5,21 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `{
-  "name": "${ config.npmName }",
-  "version": "0.1.0",
-  "description": "A React Native module powered by rem",
-  "rem": {
-    "type": "module"
-  },
-  "keywords": [
-    "react-native",
-    "react"
-  ],
-  "license": "MIT",
-  "dependencies": {}
-}
-`;
+  return "{\n  \"name\": \"" + config.npmName + "\",\n  \"version\": \"0.1.0\",\n  \"description\": \"A React Native module powered by rem\",\n  \"rem\": {\n    \"type\": \"module\"\n  },\n  \"keywords\": [\n    \"react-native\",\n    \"react\"\n  ],\n  \"license\": \"MIT\",\n  \"dependencies\": {}\n}\n";
 };
 
 module.exports = exports["default"];

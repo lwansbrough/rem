@@ -5,13 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `#import "RCTBridgeModule.h"
-
-@interface ${ config.ios.moduleName } : NSObject <RCTBridgeModule>
-
-@end
-
-`;
+  return "#import \"RCTBridgeModule.h\"\n\n@interface " + config.ios.moduleName + " : NSObject <RCTBridgeModule>\n\n@end\n\n";
 };
 
 module.exports = exports["default"];

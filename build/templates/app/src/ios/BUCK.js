@@ -5,11 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `apple_library(
-  name = 'rem_build',
-  deps = []
-)
-`;
+  return "apple_library(\n  name = 'rem_build',\n  deps = []\n)\n";
 };
 
 // export default (config) => {

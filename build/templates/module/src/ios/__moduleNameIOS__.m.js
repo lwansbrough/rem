@@ -5,19 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `#import "${ config.ios.moduleName }.h"
-
-@implementation ${ config.ios.moduleName }
-
-RCT_EXPORT_MODULE()
-
-RCT_EXPORT_METHOD(test)
-{
-  // Your implementation here
-}
-
-@end
-`;
+  return "#import \"" + config.ios.moduleName + ".h\"\n\n@implementation " + config.ios.moduleName + "\n\nRCT_EXPORT_MODULE()\n\nRCT_EXPORT_METHOD(test)\n{\n  // Your implementation here\n}\n\n@end\n";
 };
 
 module.exports = exports["default"];

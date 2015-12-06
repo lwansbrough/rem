@@ -1,0 +1,1 @@
+{"version":3,"sources":["templates/module/src/android/BUCK.js"],"names":[],"mappings":";;;;;;qBAAe,UAAC,MAAM,EAAK;AACzB,iGAMC;CACF","file":"templates/module/src/android/BUCK.js","sourcesContent":["export default (config) => {\n  return (\n`java_library(\n  name = 'rem_build',\n  srcs = glob(['**/*.java']),\n  deps = []\n)\n`);\n}"],"sourceRoot":"/source/"}

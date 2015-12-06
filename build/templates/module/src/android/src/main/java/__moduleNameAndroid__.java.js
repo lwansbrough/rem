@@ -5,42 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `package ${ config.android.packageIdentifier };
-
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import com.facebook.react.ReactPackage;
-import com.facebook.react.bridge.NativeModule;
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.uimanager.ViewManager;
-import com.facebook.react.bridge.JavaScriptModule;
-
-public class ${ config.android.moduleName } implements ReactPackage {
-
-  @Override
-  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
-    List<NativeModule> modules = new ArrayList<>();
-
-    modules.add(new ${ config.android.moduleName }(reactContext));
-
-    return modules;
-  }
-
-  @Override
-  public List<Class<? extends JavaScriptModule>> createJSModules() {
-  	return Collections.emptyList();
-  }
-
-  @Override
-  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
-  	return Collections.emptyList();
-  }
-
-}
-`;
+  return "package " + config.android.packageIdentifier + ";\n\nimport java.util.Arrays;\nimport java.util.ArrayList;\nimport java.util.Collections;\nimport java.util.List;\n\nimport com.facebook.react.ReactPackage;\nimport com.facebook.react.bridge.NativeModule;\nimport com.facebook.react.bridge.ReactApplicationContext;\nimport com.facebook.react.uimanager.ViewManager;\nimport com.facebook.react.bridge.JavaScriptModule;\n\npublic class " + config.android.moduleName + " implements ReactPackage {\n\n  @Override\n  public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {\n    List<NativeModule> modules = new ArrayList<>();\n\n    modules.add(new " + config.android.moduleName + "(reactContext));\n\n    return modules;\n  }\n\n  @Override\n  public List<Class<? extends JavaScriptModule>> createJSModules() {\n  \treturn Collections.emptyList();\n  }\n\n  @Override\n  public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {\n  \treturn Collections.emptyList();\n  }\n\n}\n";
 };
 
 module.exports = exports["default"];

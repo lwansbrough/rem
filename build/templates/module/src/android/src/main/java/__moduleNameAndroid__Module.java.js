@@ -5,39 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `package ${ config.android.packageIdentifier };
-
-import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.bridge.ReactContextBaseJavaModule;
-import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.ReadableMap;
-import com.facebook.react.bridge.ReadableArray;
-import com.facebook.react.bridge.Callback;
-
-/**
- * {@link NativeModule}
- */
-
-public class ${ config.android.moduleName }Module extends ReactContextBaseJavaModule {
-
-  ReactApplicationContext reactContext;
-
-  public ${ config.android.moduleName }Module(ReactApplicationContext reactContext) {
-    super(reactContext);
-    this.reactContext = reactContext;
-  }
-
-  @Override
-  public String getName() {
-    return "${ config.android.moduleName }";
-  }
-
-  @ReactMethod
-  public void test(ReadableMap options, Callback callback) {
-    callback.invoke(null, "test");
-  }
-}
-`;
+  return "package " + config.android.packageIdentifier + ";\n\nimport com.facebook.react.bridge.ReactApplicationContext;\nimport com.facebook.react.bridge.ReactContextBaseJavaModule;\nimport com.facebook.react.bridge.ReactMethod;\nimport com.facebook.react.bridge.ReadableMap;\nimport com.facebook.react.bridge.ReadableArray;\nimport com.facebook.react.bridge.Callback;\n\n/**\n * {@link NativeModule}\n */\n\npublic class " + config.android.moduleName + "Module extends ReactContextBaseJavaModule {\n\n  ReactApplicationContext reactContext;\n\n  public " + config.android.moduleName + "Module(ReactApplicationContext reactContext) {\n    super(reactContext);\n    this.reactContext = reactContext;\n  }\n\n  @Override\n  public String getName() {\n    return \"" + config.android.moduleName + "\";\n  }\n\n  @ReactMethod\n  public void test(ReadableMap options, Callback callback) {\n    callback.invoke(null, \"test\");\n  }\n}\n";
 };
 
 module.exports = exports["default"];

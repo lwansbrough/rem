@@ -5,12 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="${ config.android.packageIdentifier }">
-
-  <!-- Permissions, etc. here !-->
-
-</manifest>
-`;
+  return "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" package=\"" + config.android.packageIdentifier + "\">\n\n  <!-- Permissions, etc. here !-->\n\n</manifest>\n";
 };
 
 module.exports = exports["default"];

@@ -5,12 +5,7 @@ Object.defineProperty(exports, "__esModule", {
 });
 
 exports["default"] = function (config) {
-  return `java_library(
-  name = 'rem_build',
-  srcs = glob(['**/*.java']),
-  deps = [],
-)
-`;
+  return "java_library(\n  name = 'rem_build',\n  srcs = glob(['**/*.java']),\n  deps = [],\n)\n";
 };
 
 // export default (config) => {
